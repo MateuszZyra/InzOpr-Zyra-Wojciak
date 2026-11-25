@@ -1,32 +1,98 @@
-RiskR - bezpieczne środowisko do wykrywania słabości systemów informatycznych
+# RiskR
 
-Mateusz Zyra - 174650@student.uwm.edu.pl; kierownik zespołu, deweloper
-Adam Wójciak - 180648@student.uwm.edu.pl; deweloper
+Lokalne laboratorium do testowania odporności usług przez kontrolowane symulowanie awarii.
 
-RiskR to aplikacja wykorzystująca założenia Chaos Engineering, której głównym celem jest testowanie odporności, stabilności oraz niezawodności systemów informatycznych poprzez kontrolowane symulowanie awarii i zakłóceń. Projekt zakłada stworzenie bezpiecznego, izolowanego środowiska testowego, w którym użytkownik będzie mógł przeprowadzać eksperymenty polegające na celowym wprowadzaniu błędów do działających aplikacji i usług. Takie podejście pozwoli sprawdzić, jak system zachowuje się w nieprzewidzianych sytuacjach oraz czy potrafi prawidłowo reagować na występujące problemy. Aplikacja będzie umożliwiała przeprowadzanie różnych scenariuszy awaryjnych, takich jak generowanie błędów HTTP 500, zwiększanie opóźnień odpowiedzi serwera, symulowanie przeciążenia czy czasowej niedostępności wybranych usług. Użytkownik będzie mógł konfigurować parametry eksperymentów, w tym rodzaj zakłócenia, jego intensywność oraz czas trwania. Istotnym elementem projektu będzie monitorowanie zachowania testowanego systemu w czasie rzeczywistym. RiskR będzie zbierać informacje i analizować dane dotyczące m.in. czasu odpowiedzi, liczby błędów, dostępności usług oraz skuteczności mechanizmów obsługi awarii. Wyniki eksperymentów zostaną przedstawione w postaci czytelnych wykresów, statystyk i raportów. Aplikacja ma również umożliwiać porównywanie działania systemu przed wystąpieniem zakłócenia, w jego trakcie oraz po zakończeniu eksperymentu. Dzięki temu użytkownik będzie mógł określić wpływ konkretnej awarii na funkcjonowanie aplikacji i zidentyfikować jej potencjalne słabości. Głównym założeniem RiskR jest wykrywanie problemów, zanim wystąpią one w rzeczywistym środowisku produkcyjnym. Projekt łączy zagadnienia inżynierii oprogramowania, testowania, monitorowania systemów oraz analizy niezawodności, oferując narzędzie wspierające tworzenie bardziej odpornych aplikacji.
+**Zespół:** Mateusz Zyra i Adam Wójciak.
 
-ZAKRES:
+## Funkcje v1
 
-F01	Użytkownik może przeprowadzać eksperymenty na aplikacjach i usługach w bezpiecznym, izolowanym środowisku testowym.	MVP
+- W01: dwie usługi demonstracyjne i sprawdzenie ich gotowości.
+- W02: wybór HTTP 500, opóźnienia, przeciążenia lub niedostępności, zapis konfiguracji i walidacja parametrów.
+- W03: pomiary HTTP na żywo, ręczne zatrzymanie i automatyczne zakończenie testu.
+- Trwała baza SQLite, jeden aktywny eksperyment i limit czasu 300 s.
 
-F02	Użytkownik może wybrać scenariusz awarii: błędy HTTP 500, zwiększone opóźnienia odpowiedzi, przeciążenie lub czasową niedostępność usługi.	MVP
+## Uruchomienie na Windows
 
-F03	Użytkownik może skonfigurować eksperyment, wskazując testowaną usługę, intensywność zakłócenia oraz czas jego trwania.	MVP
+Wymagania: Python 3.12 lub nowszy z modułami venv, pip i sqlite3. W katalogu projektu wykonaj:
 
-F04	Użytkownik może uruchomić eksperyment oraz zatrzymać go przed upływem zaplanowanego czasu.	MVP
+```powershell
+py -3 -m venv .venv
+.\.venv\Scripts\python.exe -m pip install -r requirements.txt
+.\.venv\Scripts\python.exe app.py init-db
+.\.venv\Scripts\python.exe app.py run
+```
 
-F05	Użytkownik może monitorować w czasie rzeczywistym czas odpowiedzi, liczbę błędów oraz dostępność testowanych usług.	MVP
+Otwórz [http://127.0.0.1:5000](http://127.0.0.1:5000). Zatrzymanie serwera: Ctrl+C. Przy zajętym porcie dopisz `--port 5050` do polecenia uruchomienia i otwórz port 5050.
 
-F06	Użytkownik może przeglądać wyniki zakończonego eksperymentu w postaci wykresów i statystyk, aby ocenić wpływ zakłócenia na działanie systemu.	Rozszerzenie — poza MVP
+Na stanowisku weryfikacyjnym Python był dostarczony w środowisku narzędziowym i nie był zarejestrowany w programie `py`. Na zwykłym stanowisku można zainstalować go z [python.org](https://www.python.org/downloads/). Każdy komputer tworzy własne środowisko `.venv`; nie należy kopiować tego katalogu między komputerami.
 
-F07	Użytkownik może porównać działanie systemu przed zakłóceniem, w jego trakcie i po zakończeniu, aby ocenić skuteczność mechanizmów obsługi awarii oraz powrót do prawidłowego działania.	Rozszerzenie — poza MVP
+## Linux / macOS
 
-F08	Użytkownik może wygenerować raport podsumowujący konfigurację eksperymentu, zebrane pomiary oraz zaobserwowane problemy.	Rozszerzenie — poza MVP
+```bash
+python3 -m venv .venv
+.venv/bin/python -m pip install -r requirements.txt
+.venv/bin/python app.py init-db
+.venv/bin/python app.py run
+```
 
-POZA ZAKRESEM:
+## Baza i tryb lokalny
 
-1. Porównywanie działania systemu przed awarią, w jej trakcie i po zakończeniu eksperymentu — pierwsza wersja umożliwi monitorowanie bieżących parametrów, ale nie obejmie porównania tych trzech etapów.
-2. Generowanie raportów z eksperymentów — pierwsza wersja nie umożliwi tworzenia raportów podsumowujących konfigurację testu, zebrane pomiary i zaobserwowane problemy.
+`init-db` tworzy tabele i dwie usługi demonstracyjne bez usuwania istniejących danych. Baza znajduje się w `instance/riskr.sqlite3`. Opcja `--database` pozwala podać inny plik zarówno podczas inicjalizacji, jak i startu.
 
-https://github.com/MateuszZyra/InzOpr-Zyra-Wojciak
-https://thebill.labochat.com/
+Tryb v1 jest jednoosobowy i nie wymaga logowania. Cele to wyłącznie `demo-api` i `demo-worker`, działające na serwerze HTTP w procesie aplikacji, na losowym porcie `127.0.0.1`. Formularz nie przyjmuje zewnętrznych URL-i. Przeciążenie oznacza dodatkowe żądania do usługi demo, a nie obciążanie całego komputera.
+
+Ograniczenie celów nie stanowi izolacji systemowej. `isolation_verified` pozostaje fałszywe; `target_scope_verified` potwierdza gotowość laboratorium. Po awaryjnym restarcie zakłócenia starego procesu przestają istnieć, a przerwane testy otrzymują status `failed` z zachowaniem pomiarów.
+
+Uruchamiaj aplikację przez `app.py run`. Nie używaj reloadera Flask ani kilku workerów na tej samej bazie. Blokada pliku zabezpiecza uruchomienia przez udostępnione polecenie CLI.
+
+## Wariant kontenerowy
+
+Wymaga Docker Engine / Docker Desktop i Docker Compose:
+
+```text
+docker compose up --build
+```
+
+Konfiguracja publikuje port tylko na `127.0.0.1:5000`, stosuje sieć `internal`, limity zasobów i wolumen `riskr-data`. `docker compose down` zatrzymuje środowisko i zachowuje bazę. Wariant nie został uruchomiony na stanowisku testowym, na którym nie ma Dockera.
+
+## Pierwszy eksperyment
+
+1. W W01 wybierz konfigurację `demo-api`.
+2. Ustaw opóźnienie 500 ms i czas 30 s.
+3. Zapisz konfigurację lub uruchom eksperyment.
+4. Obserwuj pomiary w W03. Bazowa obsługa trwa około 120 ms, dlatego z dodatkowym opóźnieniem średnia wyniesie zwykle nieco ponad 620 ms.
+5. Poczekaj na koniec lub użyj przycisku zatrzymania.
+
+Interfejs pobiera dane co 5 s. Okna pomiarowe zamykane są między sondami, dlatego wolna odpowiedź lub timeout mogą opóźnić zamknięcie okna. Przy zatrzymywaniu żądanie w toku może trafić do ostatniego, krótszego okna.
+
+## Testy
+
+```powershell
+.\.venv\Scripts\python.exe -m unittest discover -s tests -v
+```
+
+Testy tworzą osobne bazy pod `tmp` oraz lokalne usługi HTTP. Nie korzystają z bazy użytkownika ani zewnętrznych celów. Wynik weryfikacji: **16 testów, wszystkie zakończone powodzeniem**. Szczegóły zawiera [raport testów](docs/testy-v1.md).
+
+## Struktura
+
+```text
+app.py                 routing, formularze, API i polecenia startowe
+riskr/db.py            schemat SQLite, inicjalizacja i agregacja
+riskr/laboratory.py    usługi demonstracyjne i zakłócenia HTTP
+riskr/engine.py        runner i reguły eksperymentów
+templates/             widoki W01–W03
+static/                style i monitorowanie
+tests/                 testy automatyczne
+docs/                  dokumentacja
+```
+
+## Dokumentacja
+
+- [Mapa projektu v1](docs/roadmap-v1.md).
+- [Technologie i architektura](docs/technologie.md).
+- [Prompty i korekty implementacji](docs/prompty-v1.md).
+- [Wyniki testów](docs/testy-v1.md).
+- [Zadania projektu](docs/labochat-zadania.md).
+- [Lista funkcjonalności PDF](output/pdf/RiskR_lista_funkcjonalnosci.pdf).
+
+Wykresy historyczne, porównanie faz przed/w trakcie/po awarii i raporty pozostają poza v1.

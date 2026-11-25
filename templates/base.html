@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="pl">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="csrf-token" content="{{ csrf }}">
+  <title>{% block title %}RiskR — laboratorium odporności{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <script src="{{ url_for('static', filename='app.js') }}" defer></script>
+</head>
+<body>
+  <aside class="sidebar">
+    <a class="brand" href="{{ url_for('home') }}">Risk<span>R</span><small>LABORATORIUM ODPORNOŚCI</small></a>
+    <div class="nav-label">PRZESTRZEŃ ROBOCZA</div>
+    <nav aria-label="Nawigacja główna">
+      <a class="{{ 'active' if nav == 'home' }}" href="{{ url_for('home') }}"><span>01</span> Środowisko</a>
+      <a class="{{ 'active' if nav == 'new' }}" href="{{ url_for('configure') }}"><span>02</span> Nowy eksperyment</a>
+      <div class="nav-static {{ 'active' if nav == 'monitor' }}"><span>03</span> Monitorowanie</div>
+    </nav>
+    <div class="sidebar-note"><span class="dot"></span> LOKALNE LABORATORIUM<p>Kontrolowane zakłócenia.<br>Mierzalna odporność.</p><small>Wersja 1.0</small></div>
+  </aside>
+  <main>
+    <div class="topbar"><span>RiskR / {% block breadcrumb %}Środowisko{% endblock %}</span><span class="pill">TRYB DEMONSTRACYJNY</span></div>
+    {% for category, message in get_flashed_messages(with_categories=true) %}<div class="notice {{ category }}" role="status">{{ message }}</div>{% endfor %}
+    {% block content %}{% endblock %}
+    <footer>RiskR · Mateusz Zyra &amp; Adam Wójciak <span>Lokalne usługi demonstracyjne</span></footer>
+  </main>
+</body>
+</html>

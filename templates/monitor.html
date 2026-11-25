@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% block breadcrumb %}Monitorowanie{% endblock %}
+{% block content %}
+<div id="monitor" data-endpoint="{{ url_for('snapshot', identifier=row.id) }}" data-stop="{{ url_for('stop', identifier=row.id) }}">
+<header class="page-heading"><div><p class="eyebrow">03 / MONITOROWANIE</p><h1>{{ row.service_id }} <span class="badge" id="status">{{ statuses[row.status] }}</span></h1><p>{{ scenarios[row.fault_type].label }} · {{ row.intensity }} {{ scenarios[row.fault_type].unit }} · {{ row.duration_seconds }} s</p></div><button id="stop" class="danger" {{ 'disabled' if row.status in ['completed','stopped','failed'] }}>Zatrzymaj eksperyment</button></header>
+<div class="experiment-strip"><span>Eksperyment <code>{{ row.id[:8] }}</code></span><span>Pozostało <strong id="remaining">{{ data.remaining }}</strong> s</span><span>Odświeżanie co 5 s</span></div>
+<div class="notice" id="monitor-message" role="status">{{ row.error_message or 'Oczekiwanie na aktualizację pomiarów…' }}</div>
+<section class="metrics"><article class="card"><span>Średni czas odpowiedzi</span><strong id="response">—</strong><small>Odebrane odpowiedzi HTTP</small></article><article class="card"><span>Błędy HTTP 5xx</span><strong id="errors">—</strong><small>Ostatnie okno pomiarowe</small></article><article class="card"><span>Dostępność</span><strong id="availability">—</strong><small>Odpowiedzi HTTP 2xx i 3xx</small></article></section>
+<section><div class="section-heading"><div><h2>Ostatnie pomiary</h2><p>Rzeczywiste sondy HTTP do wybranej usługi.</p></div><small id="updated">Brak danych</small></div><div class="card table-wrapper"><table><thead><tr><th scope="col">Koniec okna</th><th scope="col">Próby</th><th scope="col">Odpowiedzi</th><th scope="col">HTTP 5xx</th><th scope="col">Timeouty</th><th scope="col">Błędy połączeń</th><th scope="col">Śr. czas</th></tr></thead><tbody id="measurements"><tr><td colspan="7">Pierwsze pomiary pojawią się po zakończeniu okna pomiarowego.</td></tr></tbody></table></div></section>
+<div class="actions"><a class="button secondary" href="{{ url_for('home') }}">← Środowisko</a><a id="new-test" class="button" href="{{ url_for('configure',service_id=row.service_id) }}" hidden>Nowy eksperyment →</a></div></div>
+{% endblock %}
